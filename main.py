@@ -20,7 +20,7 @@ def getImage():
     with open("uhd.jpg", "wb") as f:
         f.write(r.content)
 
-def mod_image(imgname, chance_of_row_repeat=0, max_row_repeats=0, min_row_repeats=0):
+def mod_image_repeat_rows(imgname, chance_of_row_repeat=0, max_row_repeats=0, min_row_repeats=0, save=True):
     img = Image.open(imgname)
     pixels = img.load()
     width, height = img.size
@@ -52,7 +52,8 @@ def mod_image(imgname, chance_of_row_repeat=0, max_row_repeats=0, min_row_repeat
                 times_to_repeat = 0
                 num_repeats = 0
                 row_to_repeat = []
-    img.save("test1.jpg")
+    if save:
+        img.save("test1.jpg")
 
 getImage()
-mod_image("uhd.jpg", 0.008, 30, 10)
+mod_image_repeat_rows("uhd.jpg", 0.008, 30, 10)
