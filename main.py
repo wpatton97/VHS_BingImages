@@ -1,6 +1,6 @@
 import requests
 import datetime
-# from PIL.Image import core
+from PIL import Image
 from constants import url
 import json
 
@@ -16,4 +16,15 @@ def getImage():
     with open("uhd.jpg", "wb") as f:
         f.write(r.content)
 
+def mod_image(imgname):
+    img = Image.open(imgname)
+    pixels = img.load()
+    width, height = img.size
+    for y in range(height):
+        for x in range(width):
+            r, g, b = img.getpixel((x, y))
+            pixels[x, y] = (b, b, b)
+    img.save("test1.jpg")
+
 getImage()
+mod_image("uhd.jpg")
