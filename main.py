@@ -96,9 +96,9 @@ def mod_image_repeat_rows(imgname, chance_of_row_repeat=0, max_row_repeats=0, mi
         img.save("test1.jpg")
 
 
-def add_img_noise(imgpath):
+def add_img_noise(imgpath, intensity=1):
     img = imageio.imread(imgpath, pilmode='RGB')
-    noise1 = img + 1 * img.std() * np.random.random(img.shape)
+    noise1 = img + intensity * img.std() * np.random.random(img.shape)
     imageio.imwrite("test2.jpg", noise1)
 
 def offset_hue(image):
@@ -108,7 +108,7 @@ def offset_hue(image):
         print(image.mode)
     pass
     
-#getImage()
+getImage()
 mod_image_repeat_rows("uhd.jpg", 0.012, 50, 10)
 add_img_noise("test1.jpg")
 
