@@ -11,8 +11,9 @@ from math import floor
 
 
 def generate_offsets(array_size, max_offset):
-    periodicity = random.randint(1, 20)
+    periodicity = random.randint(1, 10)
     periodicity = random.random() * periodicity
+    print(periodicity)
     offsets = []
     for i in range(array_size):
         # print(floor(max_offset*np.sin(periodicity*(i*np.pi/180))))
