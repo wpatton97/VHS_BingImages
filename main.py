@@ -105,7 +105,7 @@ def mod_image_repeat_rows(imgname, chance_of_row_repeat=0, max_row_repeats=0, mi
         img.save(out_name)
 
 
-def add_date(img_path, out_name="image.jpg"):
+def add_date(img_path, out_name="image.jpg", bottom_offset=0):
     date_obj = datetime.datetime.now()
     date_str_1 = date_obj.strftime("%p %H:%M")
     date_str_2 = date_obj.strftime("%b. %d %Y")
@@ -114,8 +114,8 @@ def add_date(img_path, out_name="image.jpg"):
     width, height = img.size
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("VCR_OSD_MONO_1.001.ttf", 64)
-    draw.text((corner_offset, (height-150)), date_str_1, (255, 255, 255), font=font)
-    draw.text((corner_offset, (height-75)), date_str_2, (255, 255, 255), font=font)
+    draw.text((corner_offset, (height-150-bottom_offset)), date_str_1, (255, 255, 255), font=font)
+    draw.text((corner_offset, (height-75)-bottom_offset), date_str_2, (255, 255, 255), font=font)
     draw.text((corner_offset, 25), "|| PAUSE", (255, 255, 255), font=font)
     img.save(out_name)
 
@@ -131,19 +131,19 @@ def offset_hue(image, out_name="image.jpg"):
         image.save(out_name)
 
 
-    pass
-    
-getImage(out_name="start.jpg")
-# mod_image_repeat_rows("uhd.jpg", 0.012, 50, 10)
-# add_img_noise("test1.jpg")
-# add_date("test2.jpg")
-# offset_hue("test3.jpg")
-offset_hue("start.jpg", out_name="saturated.jpg")
-mod_image_repeat_rows("saturated.jpg", 0.012, 50, 10, out_name="shifted.jpg")
-add_img_noise("shifted.jpg", out_name="noisy.jpg")
-add_date("noisy.jpg", out_name="final.jpg")
+def build_image(out_name):
+    getImage(out_name="start.jpg")
+    offset_hue("start.jpg", out_name="saturated.jpg")
+    mod_image_repeat_rows("saturated.jpg", 0.012, 50, 10, out_name="shifted.jpg")
+    add_img_noise("shifted.jpg", out_name="noisy.jpg")
+    add_date("noisy.jpg", out_name=out_name)
 
+def build_background(out_name, taskbar_offset):
+    getImage(out_name="start.jpg")
+    offset_hue("start.jpg", out_name="saturated.jpg")
+    mod_image_repeat_rows("saturated.jpg", 0.012, 50, 10, out_name="shifted.jpg")
+    add_img_noise("shifted.jpg", out_name="noisy.jpg")
+    add_date("noisy.jpg", out_name=out_name, bottom_offset=taskbar_offset)
 
-#generate_offsets(30, 50)
-
-#offset_hue("uhd.jpg")
+if __name__ == "__main__":
+    build_background("bkg.jpg", 25)
