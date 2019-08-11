@@ -1,7 +1,7 @@
-### VHS Bing Images ###
-# This program fetches the current windows locksreen, and adds VHS effects
-
-##Program Steps: 
+# VHS Bing Images #
+#### This program fetches the current windows locksreen, and adds VHS effects
+---
+# Program Steps: 
 1. ![alt-text](https://github.com/Ragex04/VHS_BingImages/blob/master/.ReadmeImages/start.jpg "Step 1")
    1. Grabs a random image from microsofts lockscreen image api
 2. ![alt-text](https://github.com/Ragex04/VHS_BingImages/blob/master/.ReadmeImages/saturated.jpg "Step 2")
