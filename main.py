@@ -22,28 +22,37 @@ def generate_offsets(array_size, max_offset):
     return offsets
 
 
-def HSVColor(img):
-    if isinstance(img,Image.Image):
-        r,g,b = img.split()
-        Hdat = []
-        Sdat = []
-        Vdat = [] 
-        for rd,gn,bl in zip(r.getdata(),g.getdata(),b.getdata()) :
-            h,s,v = colorsys.rgb_to_hsv(rd/255.,gn/255.,bl/255.)
-            Hdat.append(int(h*255.))
-            Sdat.append(int(s*255.))
-            Vdat.append(int(v*255.))
-        r.putdata(Hdat)
-        g.putdata(Sdat)
-        b.putdata(Vdat)
-        return Image.merge('RGB',(r,g,b))
-    else:
-        return None
+def hueChange(img, offset):
+    # https://stackoverflow.com/questions/27041559/rgb-to-hsv-python-change-hue-continuously/27042106
+    # It's better to raise an exception than silently return None if img is not
+    # an Image.
+    img.load()
+    r, g, b = img.split()
+    r_data = []
+    g_data = []
+    b_data = []
+
+    offset = offset/100.
+    for rd, gr, bl in zip(r.getdata(), g.getdata(), b.getdata()):
+        h, s, v = colorsys.rgb_to_hsv(rd/255.0, bl/255.0, gr/255.0)
+        # print(h, s, v)
+        # print(rd, gr, bl)
+        rgb = colorsys.hsv_to_rgb(h, s+offset, v)
+        rd, bl, gr = [int(x*255.) for x in rgb]
+        # print(rd, gr, bl)
+        r_data.append(rd)
+        g_data.append(gr)
+        b_data.append(bl)
+
+    r.putdata(r_data)
+    g.putdata(g_data)
+    b.putdata(b_data)
+    return Image.merge('RGB',(r,g,b))
 
 def decision(probability):
     return random.random() < probability
 
-def getImage():
+def getImage(out_name="image.jpg"):
     now = datetime.datetime.now()
     dt_str = now.strftime("%Y-%m-%dT%H:%M:%Sz")
     newurl = url.format(WIDTH=3840, HEIGHT=2160, DATE=dt_str)
@@ -52,10 +61,10 @@ def getImage():
     # ["ad"]["image_fullscreen_001_landscape"]["u"]
     img_url = json.loads(img_data["item"])["ad"]["image_fullscreen_001_landscape"]["u"]
     r = requests.get(img_url)
-    with open("uhd.jpg", "wb") as f:
+    with open(out_name, "wb") as f:
         f.write(r.content)
 
-def mod_image_repeat_rows(imgname, chance_of_row_repeat=0, max_row_repeats=0, min_row_repeats=0, save=True):
+def mod_image_repeat_rows(imgname, chance_of_row_repeat=0, max_row_repeats=0, min_row_repeats=0, save=True, out_name="image.jpg"):
     img = Image.open(imgname)
     pixels = img.load()
     width, height = img.size
@@ -93,10 +102,10 @@ def mod_image_repeat_rows(imgname, chance_of_row_repeat=0, max_row_repeats=0, mi
                 row_to_repeat = []
                 offsets = []
     if save:
-        img.save("test1.jpg")
+        img.save(out_name)
 
 
-def add_date(img_path):
+def add_date(img_path, out_name="image.jpg"):
     date_obj = datetime.datetime.now()
     date_str_1 = date_obj.strftime("%p %H:%M")
     date_str_2 = date_obj.strftime("%b. %d %Y")
@@ -108,24 +117,32 @@ def add_date(img_path):
     draw.text((corner_offset, (height-150)), date_str_1, (255, 255, 255), font=font)
     draw.text((corner_offset, (height-75)), date_str_2, (255, 255, 255), font=font)
     draw.text((corner_offset, 25), "|| PAUSE", (255, 255, 255), font=font)
-    img.save("test3.jpg")
+    img.save(out_name)
 
-def add_img_noise(imgpath, intensity=1):
+def add_img_noise(imgpath, intensity=1, out_name="image.jpg"):
     img = imageio.imread(imgpath, pilmode='RGB')
     noise1 = img + intensity * img.std() * np.random.random(img.shape)
-    imageio.imwrite("test2.jpg", noise1)
+    imageio.imwrite(out_name, noise1)
 
-def offset_hue(image):
+def offset_hue(image, out_name="image.jpg"):
     if isinstance(image, str):
         image = Image.open(image)
-        image = HSVColor(image)
-        print(image.mode)
+        image = hueChange(image, 25)
+        image.save(out_name)
+
+
     pass
     
-getImage()
-mod_image_repeat_rows("uhd.jpg", 0.012, 50, 10)
-add_img_noise("test1.jpg")
-add_date("test2.jpg")
+getImage(out_name="start.jpg")
+# mod_image_repeat_rows("uhd.jpg", 0.012, 50, 10)
+# add_img_noise("test1.jpg")
+# add_date("test2.jpg")
+# offset_hue("test3.jpg")
+offset_hue("start.jpg", out_name="saturated.jpg")
+mod_image_repeat_rows("saturated.jpg", 0.012, 50, 10, out_name="shifted.jpg")
+add_img_noise("shifted.jpg", out_name="noisy.jpg")
+add_date("noisy.jpg", out_name="final.jpg")
+
 
 #generate_offsets(30, 50)
 
