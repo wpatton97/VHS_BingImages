@@ -1,6 +1,8 @@
 import requests
 import datetime
 from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw 
 import colorsys
 from constants import url
 import json
@@ -13,7 +15,6 @@ from math import floor
 def generate_offsets(array_size, max_offset):
     periodicity = random.randint(1, 10)
     periodicity = random.random() * periodicity
-    print(periodicity)
     offsets = []
     for i in range(array_size):
         # print(floor(max_offset*np.sin(periodicity*(i*np.pi/180))))
@@ -69,7 +70,6 @@ def mod_image_repeat_rows(imgname, chance_of_row_repeat=0, max_row_repeats=0, mi
             repeat = True
             times_to_repeat = random.randint(min_row_repeats, max_row_repeats)
             offsets = generate_offsets(times_to_repeat, random.randint(10, 50))
-            print("Repeat true: " + str(times_to_repeat))
         for x in range(width):
             r, g, b = img.getpixel((x, y))
 
@@ -96,6 +96,20 @@ def mod_image_repeat_rows(imgname, chance_of_row_repeat=0, max_row_repeats=0, mi
         img.save("test1.jpg")
 
 
+def add_date(img_path):
+    date_obj = datetime.datetime.now()
+    date_str_1 = date_obj.strftime("%p %H:%M")
+    date_str_2 = date_obj.strftime("%b. %d %Y")
+    corner_offset = 50
+    img = Image.open(img_path)
+    width, height = img.size
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("VCR_OSD_MONO_1.001.ttf", 64)
+    draw.text((corner_offset, (height-150)), date_str_1, (255, 255, 255), font=font)
+    draw.text((corner_offset, (height-75)), date_str_2, (255, 255, 255), font=font)
+    draw.text((corner_offset, 25), "|| PAUSE", (255, 255, 255), font=font)
+    img.save("test3.jpg")
+
 def add_img_noise(imgpath, intensity=1):
     img = imageio.imread(imgpath, pilmode='RGB')
     noise1 = img + intensity * img.std() * np.random.random(img.shape)
@@ -111,6 +125,7 @@ def offset_hue(image):
 getImage()
 mod_image_repeat_rows("uhd.jpg", 0.012, 50, 10)
 add_img_noise("test1.jpg")
+add_date("test2.jpg")
 
 #generate_offsets(30, 50)
 
